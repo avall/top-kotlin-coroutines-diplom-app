@@ -1,0 +1,1153 @@
+openapi: 3.0.0
+info:
+  title: car-loan-app
+  contact: {}
+  version: '1.0'
+servers:
+  - url: 'http://localhost:8080'
+paths:
+  /app/info:
+    get:
+      summary: Заявка по идентификатору клиента
+      description: Получение заявки по идентификатору клиента
+      operationId: getApplicationInfo
+      parameters:
+        - name: clientId
+          in: query
+          description: Идентификатор клиента
+          style: form
+          explode: true
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          headers: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getApplicationInfo'
+              examples:
+                GetApplicationInfo:
+                  value:
+                    - $ref: '#/components/schemas/getApplicationInfo/x-examples/GetApplicationInfoEx'
+      deprecated: false
+      tags:
+        - app-info
+    parameters: []
+  '/app/{appId}':
+    get:
+      summary: Заявка по идентификатору
+      description: Получение заявки по идентификатору
+      operationId: getApplicationByAppId
+      parameters:
+        - name: appId
+          in: path
+          description: Идентификатор заявки/черновика
+          required: true
+          style: simple
+          schema:
+            type: string
+        - schema:
+            type: string
+          in: header
+          name: H-Client-Id
+          required: true
+      responses:
+        '200':
+          description: OK
+          headers: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/application'
+      deprecated: false
+      tags:
+        - apps
+    parameters:
+      - schema:
+          type: string
+        name: appId
+        in: path
+        required: true
+        description: Идентификатор заявки/черновика
+  '/profile/{appId}':
+    get:
+      summary: Анкета по идентификатору
+      description: Получение анкеты клиента по идентификатору заявки
+      operationId: getProfileByAppId
+      parameters:
+        - name: appId
+          in: path
+          description: Идентификатор заявки/черновика
+          required: true
+          style: simple
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          headers: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/profile'
+              examples:
+                Profile:
+                  value:
+                    $ref: '#/components/schemas/profile/x-examples/ProfileEx'
+      tags:
+        - profile
+    parameters:
+      - schema:
+          type: string
+        name: appId
+        in: path
+        required: true
+        description: Идентификатор заявки/черновика
+    put:
+      summary: Обновление анкеты по идентификатору
+      operationId: updateProfileByAppId
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+      description: Обновление анкеты клиента по идентификатору заявки
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/profile'
+            examples:
+              Profile:
+                value:
+                  $ref: '#/components/schemas/profile/x-examples/ProfileEx'
+        description: Участник заявки
+      tags:
+        - profile
+  /app:
+    post:
+      summary: Создание заявки
+      operationId: createApplication
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/postApplicationInfo'
+              examples:
+                PostApplicationInfo:
+                  value:
+                    $ref: '#/components/schemas/postApplicationInfo/x-examples/PostApplicationInfoEx'
+        '400':
+          description: Bad Request
+      description: Создание заявки
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/postApplication'
+            examples:
+              PostApplication:
+                value:
+                  $ref: '#/components/schemas/postApplication/x-examples/PostApplicationEx'
+        description: Создание заявки
+      tags:
+        - apps
+      parameters:
+        - schema:
+            type: string
+          in: header
+          name: H-Client-Id
+          description: Идентификатор клиента
+          required: true
+    parameters: []
+    put:
+      summary: Обновление заявки
+      operationId: updateApplication
+      responses:
+        '200':
+          description: OK
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/application'
+      parameters:
+        - schema:
+            type: string
+          in: header
+          name: H-Client-Id
+          description: Идентификатор клиента
+          required: true
+  '/app/{appId}/decision':
+    parameters:
+      - schema:
+          type: string
+        name: appId
+        in: path
+        required: true
+        description: Идентификатор заявки/черновика
+    post:
+      summary: Данные о решении
+      operationId: writeDecision
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+      description: Записать данные о решении
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/decision'
+            examples:
+              PostDecision:
+                value:
+                  $ref: '#/components/schemas/postDecision/x-examples/PostDecisionEx'
+        description: Решение по заявке
+      tags:
+        - apps
+    get:
+      summary: Данные о решении
+      operationId: getDecision
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/decision'
+              examples:
+                Decision:
+                  value:
+                    $ref: '#/components/schemas/postDecision/x-examples/PostDecisionEx'
+      description: Получить данные о решении
+      tags:
+        - apps
+      parameters:
+        - schema:
+            type: string
+          in: header
+          name: H-Client-Id
+          required: true
+  '/app/{appId}/status':
+    parameters:
+      - schema:
+          type: string
+        name: appId
+        in: path
+        required: true
+        description: Идентификатор заявки/черновика
+    put:
+      summary: Статус заявки
+      operationId: updateStatus
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+      description: Записать статус заявки
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/status'
+            examples:
+              Status:
+                value:
+                  $ref: '#/components/schemas/status/x-examples/StatusEx'
+        description: Статус заявки
+      tags:
+        - apps
+  '/condition/{clientId}':
+    parameters:
+      - schema:
+          type: string
+        name: clientId
+        in: path
+        required: true
+    get:
+      summary: Информация об условиях заявки по идентификатору клиента
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/condition'
+              examples:
+                Condition:
+                  value:
+                    $ref: '#/components/schemas/condition/x-examples/ConditionEx'
+      operationId: getCondition
+      description: Получение информации об условиях заявки по идентификатору клиента
+      tags:
+        - conditions
+    post:
+      summary: Данные о выбранных условиях
+      operationId: writeCondition
+      responses:
+        '200':
+          description: OK
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/condition'
+        description: Условия кредита
+      description: Записывает данные о выбранных условиях
+      tags:
+        - conditions
+components:
+  schemas:
+    offer:
+      title: offer
+      type: object
+      description: Решение по продукту/клиенту
+      properties:
+        offerId:
+          type: string
+          description: Идентификатор решения
+        decisionDate:
+          type: string
+          format: date
+          description: Дата решения
+        decisionEndDate:
+          type: string
+          format: date
+          description: Дата окончания действия решения
+        productCodeId:
+          type: string
+          description: Идентификатор альтернативного продукта
+        clientId:
+          type: string
+          description: Идентификатор клиента
+        maximumLoanAmount:
+          type: number
+          description: Рассчитанная максимальная сумма кредита
+        maxMonthlyPayment:
+          type: number
+          description: Максимальный ежемесячный платеж (совокупный по всем участникам сделки)
+        decisionDetailsBeginOfAmtRange:
+          type: number
+          description: Начало интервала суммы для ставки
+        decisionDetailsEndOfAmtRange:
+          type: number
+          description: Окончание интервала суммы для ставки
+        decisionDetailsRateOfRange:
+          type: number
+          description: Детали решения.Ставка
+        decisionDetailsTermOfRange:
+          type: integer
+          description: Альтернативный срок (в пределах разрешенного диапазона сумм/ставок)
+          format: int32
+        monthlyPayment:
+          type: number
+          description: Рассчитанный ежемесячный платеж
+    insurance:
+      title: insurance
+      type: object
+      description: Услуга страхования
+      properties:
+        typeCode:
+          type: string
+          description: Тип страховки
+        period:
+          type: integer
+          description: Срок страхования
+        amount:
+          type: number
+          description: Сумма страхования
+        program:
+          type: string
+          description: Страховая программа
+        company:
+          type: string
+          description: Страховая компания
+    decision:
+      title: decision
+      type: object
+      description: Решение по заявке
+      x-examples:
+        DecisionEx:
+          applicationId: VO1
+          statusCode: cm.LoanApplicationStatus.GPR
+          scoringStage: cm.LoanApplicationScoringStage.AdmissionApplication
+          subStatusCode: cm.DecisionCategory.DisclaimerCustomer
+          offers:
+            - offerId: '1'
+              decisionDate: '2020-01-04'
+              decisionEndDate: '2021-10-19'
+              productCodeId: '28'
+              clientId: '71'
+              liabilityType: cm.LiabilityType.CarLoan
+              decisionCode: cm.DecisionCode.Approve
+              decisionCategory: cm.DecisionCategory.Approve
+              maximumLoanAmount: '30000.0'
+              maxMonthlyPayment: '1000.0'
+              decisionDetailsBeginOfAmtRange: 1
+              decisionDetailsEndOfAmtRange: 2
+              decisionDetailsRateOfRange: 3
+              decisionDetailsTermOfRange: 2
+              salaryCategoryFlag: true
+              monthlyPayment: 1000
+      properties:
+        applicationId:
+          type: string
+          description: Идентификатор заявки
+        statusCode:
+          type: string
+          description: Наименование статуса заявки
+        offers:
+          type: array
+          description: Решение по продукту/клиенту
+          items:
+            $ref: '#/components/schemas/offer'
+    creditParam:
+      title: creditParam
+      type: object
+      description: Параметры кредита
+      properties:
+        initialFee:
+          type: number
+          description: 'Первоначальный взнос, руб'
+        initialFeePercent:
+          type: number
+          description: 'Первоначальный взнос, %'
+        initialFeeCurrency:
+          type: string
+          description: Валюта первоначального взноса
+        requestedAmount:
+          type: number
+          description: Запрашиваемая сумма кредита
+        requestedCurrency:
+          type: string
+          description: Запрашиваемая Валюта
+        requestedTerm:
+          type: integer
+          description: Запрашиваемый срок кредита
+          format: int32
+    application:
+      title: application
+      type: object
+      description: Заявка
+      x-examples: {}
+      properties:
+        applicationId:
+          minLength: 15
+          type: string
+          description: Идентификатор заявки
+        userName:
+          type: string
+          description: ФИО заполнившего заявку
+        login:
+          type: string
+          description: 'Логин сотрудника, принявшего заявку'
+        purchaseRegion:
+          type: string
+          description: Регион приобретения автомобиля
+        applicationType:
+          type: string
+          description: Тип анкеты
+        prescoringFlag:
+          type: boolean
+          description: Признак мини-анкеты
+        loanType:
+          type: string
+          description: Класс кредита
+        productCode:
+          type: string
+          description: Код продукта
+        creditProgram:
+          type: string
+          description: Кредитная программа
+        programCode:
+          type: string
+          description: Код программы
+        appCreateDate:
+          type: string
+          description: Дата создания (подачи) заявки
+          format: date-time
+        confirmationDate:
+          type: string
+          format: date-time
+        applicationStatus:
+          type: string
+          description: Текущий статус заявки в ВТБ-Онлайн
+        creditParam:
+          $ref: '#/components/schemas/creditParam'
+        creditProgramParam:
+          $ref: '#/components/schemas/creditProgram'
+        auto:
+          $ref: '#/components/schemas/auto'
+        insurances:
+          type: array
+          description: Услуги страхования
+          items:
+            $ref: '#/components/schemas/insurance'
+        profiles:
+          type: array
+          description: Участники заявки
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/profile'
+        decision:
+          $ref: '#/components/schemas/decision'
+        isBki:
+          type: boolean
+        isPassportValid:
+          type: boolean
+        isIncomeValid:
+          type: boolean
+        isClientValid:
+          type: boolean
+        isSolvency:
+          type: boolean
+        isUnderwriting:
+          type: boolean
+    creditProgram:
+      title: creditProgram
+      type: object
+      description: Параметры кредитной программы
+      properties:
+        minTerm:
+          type: integer
+          description: Минимальный срок программы
+        maxTerm:
+          type: integer
+          description: Максимальный срок программы
+        minAmount:
+          type: number
+          description: Минимальная сумма продукта
+        maxAmount:
+          type: number
+          description: Максимальная сумма продукта
+        fixedRate:
+          type: number
+          description: Итоговая процентная ставка
+        fundingRate:
+          type: number
+          description: Базовая процентная ставка
+    auto:
+      title: auto
+      type: object
+      description: ТС
+      properties:
+        category:
+          type: string
+          description: Вид ТС
+        mark:
+          type: string
+          description: Марка автомобиля
+        model:
+          type: string
+          description: Модель автомобиля
+        amount:
+          type: number
+          description: Стоимость автомобиля
+        currency:
+          type: string
+          description: Валюта стоимости
+        purchaseRegion:
+          type: string
+          description: Регион приобретения автомобиля (услуги)
+    profile:
+      title: profile
+      type: object
+      description: Анкета
+      x-examples:
+        ProfileEx:
+          mdmId: '1'
+          custAnalysisFlag: true
+          clientType: cm.CustomerLifeCycleStatus.Client
+          bureauRequestFlag: true
+          bureauUploadFlag: true
+          pfrRequestConsent: true
+          consentTelecomRequest: true
+          personalInfoRequestFlag: true
+          clientClass: cm.CustomerType.Person
+          residentFlag: true
+          salaryFlag: true
+          corporateCategory: cm.CorporateCategory.CategoryA
+          repeatFlag: false
+          childrenDependentsQty: 1
+          applicantRoles:
+            - applicantRole: cm.CustomerLoanApplicationRole.Applicant
+          surname: Скаарсенсон
+          name: Скаарсен
+          middleName: Скаарсенсенсон
+          birthDate: '1970-12-29'
+          birthPlace: Скандинавия
+          gender: cm.Gender.Male
+          marriageStatus: cm.MaritalStatus.Single
+          familyMembersNumber: 2
+          citizenshipCountry: cm.Country.RUS
+          taxCode: '411212'
+          snils: 250-744-649 70
+          snilsByClient: false
+          isChanged: true
+          prevLastName: Никто
+          prevFirstName: Не
+          prevMiddleName: Знает
+          isChangedByClient: true
+          education: cm.Education.HigherEducation
+          incomes:
+            - type: cm.PersonIncomeType.AverageMonthlyNet
+              amt: 40000
+              currencyCode: cm.Currency.643
+          employments:
+            - workType: cm.PersonEmploymentType.PrimaryWork
+              employmentType: cm.PersonEmploymentContractType.Derivative
+              jobType: cm.PersonJobType.ForHire
+              taxCode: '123123'
+              companyName: Рога и Ко
+              totalEmplTime: cm.PersonLabourExperience.GE10
+              currentEmplTime: cm.PersonWorkExperience.GE36
+              position: Заместитель начальника роты
+              positionCategory: cm.PersonJobTitleCode.MilitaryMan
+              type: cm.AddressType.Correspondence
+              country: Россия
+              countryCode: cm.Country.RUS
+              zip: '412412'
+              regionType: обл.
+              region: Московская
+              regionCode: cm.Region.Moscow
+              districtType: р-н
+              district: Кировский
+              cityType: г
+              city: Москва
+              townType: c.
+              town: Москва
+              streetType: ул.
+              street: Кузнецкий мост
+              house: '1'
+              housing: '1'
+              building: '1'
+              apartment: '1'
+              numberOfEmpl: cm.OrganizationEmployeeNumber.GE1000
+              orgActivityScope: cm.PersonEmploymentActivityKind.Army
+              addressString: 'г.Москва, ул.Кузнецкий мост, д.1'
+          applicantAddresses:
+            - type: cm.AddressType.PermanentRegistration
+              regDate: '1990-08-24'
+              endRegDate: '2090-08-24'
+              country: Россия
+              countryCode: cm.Country.RUS
+              zip: '412412'
+              regionType: обл.
+              region: Московская
+              regionCode: cm.Region.Moscow
+              districtType: р-н
+              district: Кировский
+              cityType: г
+              city: Москва
+              townType: c.
+              town: Москва
+              streetType: ул.
+              street: Кузнецкий мост
+              house: '1'
+              housing: '1'
+              building: '1'
+              apartment: '1'
+              addressString: 'г.Москва, ул.Кузнецкий мост, д.1'
+            - type: cm.AddressType.Actual
+              regDate: '1990-08-24'
+              endRegDate: '2090-08-24'
+              country: Россия
+              countryCode: cm.Country.RUS
+              zip: '412412'
+              regionType: обл.
+              region: Московская
+              regionCode: cm.Region.Moscow
+              districtType: р-н
+              district: Кировский
+              cityType: г
+              city: Москва
+              townType: c.
+              town: Москва
+              streetType: ул.
+              street: Кузнецкий мост
+              house: '1'
+              housing: '1'
+              building: '1'
+              apartment: '1'
+              addressString: 'г.Москва, ул.Её величества Шаурмы, д.2'
+          applicantPhones:
+            - type: cm.PhoneType.Contact
+              countryPrefix: '7'
+              localPrefix: '532'
+              addNumber: '5125121'
+              contactValue: '75325125121'
+            - type: cm.PhoneType.Workplace
+              countryPrefix: '7'
+              localPrefix: '532'
+              addNumber: '5125121'
+              contactValue: '75325125121'
+          applicantContacts:
+            - value: Jj@fsdf.ru
+              type: cm.EmailType.Personal
+            - value: Jj@fsdf.ru
+              type: cm.EmailType.Work
+          applicantDocuments:
+            - sort: cm.PersonDocumentKind.Main
+              docType: cm.DocumentType.28
+              series: 76 13
+              number: '765564'
+              issueDate: '1990-10-19'
+              expDate: '2023-10-19'
+              issuer: Отдел отдела по работе с отделом отдела номер 1
+              issueDivisionCode: 640-040
+      properties:
+        clientId:
+          type: string
+          description: Идентификатор клиента
+        clientType:
+          type: string
+          description: Тип клиента
+        pfrRequestConsent:
+          type: boolean
+          description: Согласие на запрос в ПФР
+        consentTelecomRequest:
+          type: boolean
+          description: Согласие клиента на проверку номера телефона на стороне Телеком операторов
+        personalInfoRequestFlag:
+          type: boolean
+          description: Согласие на обработку персональных данных
+        isSalary:
+          type: boolean
+          description: Признак зарплатного Клиента
+        childrenDependentsQty:
+          type: integer
+          description: Число детей
+          format: int32
+        surname:
+          type: string
+          description: Фамилия
+        name:
+          type: string
+          description: Имя
+        middleName:
+          type: string
+          description: Отчество
+        birthDate:
+          type: string
+          description: Дата рождения
+          format: date
+        birthPlace:
+          type: string
+          description: Место рождения
+        gender:
+          type: string
+          description: Пол
+        marriageStatus:
+          type: string
+          description: Семейное положение
+        familyMembersNumber:
+          description: Количество членов семьи
+          type: integer
+        citizenshipCountry:
+          type: string
+          description: Страна гражданства
+        taxCode:
+          type: string
+          description: ИНН клиента
+        education:
+          type: string
+          description: Тип образования
+        incomes:
+          type: array
+          description: Доходы
+          items:
+            $ref: '#/components/schemas/income'
+        employments:
+          type: array
+          description: Место работы
+          items:
+            $ref: '#/components/schemas/employment'
+        addresses:
+          type: array
+          description: Адреса Клиента
+          items:
+            $ref: '#/components/schemas/address'
+        phones:
+          type: array
+          description: Телефоны Клиента
+          items:
+            $ref: '#/components/schemas/phone'
+        contacts:
+          type: array
+          description: Другие контакты
+          items:
+            $ref: '#/components/schemas/contact'
+        documents:
+          type: array
+          description: Документы
+          items:
+            $ref: '#/components/schemas/document'
+    getApplicationInfo:
+      title: getApplicationInfo
+      type: object
+      description: Информация по заявкам клиента
+      x-examples:
+        GetApplicationInfoEx:
+          applicationId: VO1
+          appDate: '2020-08-12T12:04:43.071089Z'
+          confirmationDate: '2020-08-12T12:04:43.071089Z'
+          appLastUpDate: '2020-08-12T12:19:02.982358Z'
+          applicationStatus: DRAFT
+      properties:
+        applicationId:
+          type: string
+          description: Идентификатор заявки
+        appDate:
+          type: string
+          format: date-time
+        confirmationDate:
+          type: string
+          format: date-time
+        appStatus:
+          type: string
+    postApplicationInfo:
+      title: postApplicationInfo
+      type: object
+      description: Информация по созданной модели
+      x-examples:
+        PostApplicationInfoEx:
+          applicationId: VO1
+          appDate: '2020-08-12T12:04:43.071089Z'
+          appLastUpDate: '2020-08-12T12:19:02.982358Z'
+      properties:
+        applicationId:
+          type: string
+          description: Идентификатор заявки
+        appDate:
+          type: string
+          format: date-time
+          description: Дата создания (подачи) заявки
+    role:
+      title: role
+      type: object
+      description: Роль в заявке
+      properties:
+        applicantRole:
+          type: string
+          description: Роль в заявке
+    income:
+      title: income
+      type: object
+      properties:
+        type:
+          type: string
+          description: Тип дохода
+        amt:
+          type: number
+          description: Сумма дохода
+        currencyCode:
+          type: string
+      description: Доход
+    employment:
+      title: employment
+      type: object
+      description: Место работы
+      properties:
+        workType:
+          type: string
+          description: Вид работы
+        employmentType:
+          type: string
+          description: Тип работы (занятости)
+        jobType:
+          type: string
+          description: Тип работы (трудоустройства)
+        companyName:
+          type: string
+          description: Наименование компании
+        totalEmplTime:
+          type: string
+          description: Общий стаж
+        currentEmplTime:
+          type: string
+          description: Стаж на текущем месте
+        position:
+          type: string
+          description: Должность
+        numberOfEmpl:
+          type: string
+          description: Количество сотрудников организации
+        orgActivityScope:
+          type: string
+          description: Сфера деятельности организации
+        address:
+          $ref: '#/components/schemas/address'
+    address:
+      title: address
+      type: object
+      description: Адрес Клиента
+      x-examples: {}
+      properties:
+        type:
+          type: string
+          description: Вид адреса
+        regDate:
+          type: string
+          description: Дата регистрации
+          format: date
+        endRegDate:
+          type: string
+          description: Дата окончания регистрации
+          format: date
+        country:
+          type: string
+          description: Страна
+        zip:
+          type: string
+          description: Почтовый индекс
+        region:
+          type: string
+          description: Регион
+        district:
+          type: string
+          description: Район
+        city:
+          type: string
+          description: Город
+        town:
+          type: string
+          description: Населенный пункт
+        street:
+          type: string
+          description: Улица
+        house:
+          type: string
+          description: Дом
+        housing:
+          type: string
+          description: Корпус
+        building:
+          type: string
+          description: Строение
+        apartment:
+          type: string
+          description: Квартира
+        addressString:
+          type: string
+          description: Адрес Строкой
+    contact:
+      title: contact
+      type: object
+      properties:
+        value:
+          type: string
+          description: Адрес контакта
+        type:
+          type: string
+          description: Код типа Email
+      description: Другой контакт
+    document:
+      title: document
+      type: object
+      description: Документ
+      properties:
+        docType:
+          type: string
+          description: Тип документа
+        series:
+          type: string
+          description: Серия
+        number:
+          type: string
+          description: Номер
+        issueDate:
+          type: string
+          description: Дата выдачи
+          format: date
+        expDate:
+          type: string
+          description: Дата окончания срока действия
+          format: date
+        issuer:
+          type: string
+          description: Наименование органа
+        issueDivisionCode:
+          type: string
+          description: Код органа
+    phone:
+      title: phone
+      type: object
+      properties:
+        type:
+          type: string
+          description: Тип номера
+        countryPrefix:
+          type: string
+          description: Код страны
+        localPrefix:
+          type: string
+          description: Код города/оператора
+        addNumber:
+          type: string
+          description: Номер добавочный
+        contactValue:
+          type: string
+          description: Полный номер телефона
+      description: Телефон Клиента
+    condition:
+      title: condition
+      type: object
+      description: Условия кредита
+      x-examples:
+        ConditionEx:
+          loanClass: '11'
+          productCode: АЛ
+          creditProgram: cm.BonusCreditProgramType.Balloon
+          programDescription: ЭкстраЛайт
+          programCode: ExtraLite
+          productKindCode: cm.LoanProductGroup.Avtolayt
+          creditParam:
+            initialFee: 1000
+            initialFeePercent: 13
+            initialFeeCurrency: cm.Currency.643
+            requestedAmount: 10000
+            requestedCurrency: cm.Currency.643
+            requestedTerm: 13
+          creditProgramParam:
+            minTerm: 10
+            maxTerm: 13
+            minAmount: 10000
+            maxAmount: 100000
+            fixedRate: 13
+            fundingRate: 10
+          discounts:
+            - value: 10
+              type: cm.DiscountPremiumType.InsuranceDiscounts
+              discountOrAllowance: Дисконт
+          auto:
+            type: true
+            category: cm.VehicleType.Passenger
+            mark: CADILLAC
+            model: De Ville
+            amount: 400000
+            currency: cm.Currency.643
+            purchaseRegion: cm.Region.Moscow
+          insurances:
+            - typeCode: cm.InsuranceType.KASKO
+              includeToLoan: false
+              period: 3
+              premium: 1000
+              amount: 10000
+              assetCurrency: cm.Currency.643
+              program: cm.InsuraceProgramCode.CASCO
+              company: РоссГосСтрах
+      properties:
+        loanType:
+          type: string
+          description: Класс кредита
+        productCode:
+          type: string
+          description: Код продукта
+        creditProgram:
+          type: string
+          description: Кредитная программа
+        programCode:
+          type: string
+          description: Код программы
+        creditParam:
+          $ref: '#/components/schemas/creditParam'
+        creditProgramParam:
+          $ref: '#/components/schemas/creditProgram'
+        auto:
+          $ref: '#/components/schemas/auto'
+        insurances:
+          type: array
+          description: Услуги страхования
+          items:
+            $ref: '#/components/schemas/insurance'
+      required:
+        - loanType
+        - productCode
+        - creditProgram
+        - programCode
+        - creditParam
+        - creditProgramParam
+        - auto
+    status:
+      title: status
+      type: object
+      properties:
+        newApplicationStatus:
+          type: string
+          description: Новый статус заявки
+        errorText:
+          type: string
+          description: Текст ошибки
+      x-examples:
+        StatusEx:
+          newApplicationStatus: APPROVE
+          errorText: 'Help!'
+    postApplication:
+      title: postApplication
+      type: object
+      properties:
+        userName:
+          type: string
+          description: ФИО заполнившего заявку
+        login:
+          type: string
+          description: 'Логин сотрудника, принявшего заявку'
+        purchaseRegion:
+          type: string
+          description: Регион приобретения автомобиля
+        applicationType:
+          type: string
+          description: Тип анкеты
+        prescoringFlag:
+          type: boolean
+          description: Признак мини-анкеты
+        loanType:
+          type: string
+          description: Класс кредита
+        productCode:
+          type: string
+          description: Код продукта
+        creditProgram:
+          type: string
+          description: Кредитная программа
+        programCode:
+          type: string
+          description: Код программы
+        appCreationDate:
+          type: string
+          description: Дата создания (подачи) заявки
+          format: date-time
+        confirmationDate:
+          type: string
+          format: date-time
+        applicationStatus:
+          type: string
+          description: Текущий статус заявки в ВТБ-Онлайн
+        creditParam:
+          $ref: '#/components/schemas/creditParam'
+        creditProgramParam:
+          $ref: '#/components/schemas/creditProgram'
+        auto:
+          $ref: '#/components/schemas/auto'
+        insurances:
+          type: array
+          description: Услуги страхования
+          items:
+            $ref: '#/components/schemas/insurance'
+        profiles:
+          type: array
+          description: Участники заявки
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/profile'
+        decision:
+          $ref: '#/components/schemas/decision'
+  securitySchemes: {}
+tags: []

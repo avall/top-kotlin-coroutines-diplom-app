@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>diplom-app-api</module>
+        <module>diplom-app-impl</module>
+    </modules>
+
+    <groupId>ru.vgtu</groupId>
+    <artifactId>diplom-app</artifactId>
+    <version>${revision}</version>
+
+    <name>diplom-app</name>
+    <description>diplom application project</description>
+
+    <properties>
+        <java.version>11</java.version>
+        <kotlin.version>1.4.10</kotlin.version>
+        <kotlin.compiler.jvmTarget>${java.version}</kotlin.compiler.jvmTarget>
+        <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
+        <openapi-generator-maven-plugin.version>5.0.1</openapi-generator-maven-plugin.version>
+
+        <revision>0.0.1-SNAPSHOT</revision>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <spring-boot.version>2.4.2</spring-boot.version>
+        <diplom-common.version>0.0.1-SNAPSHOT</diplom-common.version>
+        <jackson-module-kotlin.version>2.12.1</jackson-module-kotlin.version>
+        <kotlin-coroutines-reactor.version>1.4.0</kotlin-coroutines-reactor.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+
+            <!-- Spring -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- VGTU -->
+
+            <dependency>
+                <groupId>ru.vgtu</groupId>
+                <artifactId>diplom-common</artifactId>
+                <version>${diplom-common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ru.vgtu.diplom</groupId>
+                <artifactId>diplom-app-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Kotlin -->
+
+            <dependency>
+                <groupId>com.fasterxml.jackson.module</groupId>
+                <artifactId>jackson-module-kotlin</artifactId>
+                <version>${jackson-module-kotlin.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-reflect</artifactId>
+                <version>${kotlin.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-stdlib</artifactId>
+                <version>${kotlin.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jetbrains.kotlinx</groupId>
+                <artifactId>kotlinx-coroutines-reactor</artifactId>
+                <version>${kotlin-coroutines-reactor.version}</version>
+            </dependency>
+
+            <!-- Util -->
+
+            <dependency>
+                <groupId>org.openapitools</groupId>
+                <artifactId>jackson-databind-nullable</artifactId>
+                <version>0.2.1</version>
+            </dependency>
+            <dependency>
+                <groupId>io.swagger</groupId>
+                <artifactId>swagger-annotations</artifactId>
+                <version>1.6.2</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.validation</groupId>
+                <artifactId>validation-api</artifactId>
+                <version>2.0.1.Final</version>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-stdlib</artifactId>
+            <version>${kotlin.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-test</artifactId>
+            <version>${kotlin.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>diplom-app</finalName>
+        <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
+        <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>${maven-source-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-maven-plugin</artifactId>
+                <version>${kotlin.version}</version>
+            </plugin>
+        </plugins>
+
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.openapitools</groupId>
+                    <artifactId>openapi-generator-maven-plugin</artifactId>
+                    <version>${openapi-generator-maven-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>kotlin-spring-boot-openapi-generator</id>
+                            <goals>
+                                <goal>generate</goal>
+                            </goals>
+                            <configuration>
+                                <!--suppress UnresolvedMavenProperty -->
+                                <inputSpec>
+                                    ${project.parent.basedir}/diplom-app-api/src/main/resources/diplom-app-v1.yaml
+                                </inputSpec>
+                                <generatorName>kotlin-spring</generatorName>
+                                <apiPackage>ru.vgtu.diplom.app.api</apiPackage>
+                                <modelPackage>ru.vgtu.diplom.app.model</modelPackage>
+                                <artifactId>openapi-spring</artifactId>
+                                <artifactVersion>0.0.1</artifactVersion>
+                                <generateSupportingFiles>false</generateSupportingFiles>
+                                <configOptions>
+                                    <artifactDescription>API for Application Service</artifactDescription>
+                                    <developerName>vevteev</developerName>
+                                    <developerOrganization>VGTU</developerOrganization>
+                                    <sourceFolder>src/main/kotlin</sourceFolder>
+                                    <disableHtmlEscaping>true</disableHtmlEscaping>
+                                    <hideGenerationTimestamp>true</hideGenerationTimestamp>
+                                    <interfaceOnly>true</interfaceOnly>
+                                    <skipDefaultInterface>true</skipDefaultInterface>
+                                    <serializableModel>true</serializableModel>
+                                    <sortModelPropertiesByRequiredFlag>false</sortModelPropertiesByRequiredFlag>
+                                    <sortParamsByRequiredFlag>false</sortParamsByRequiredFlag>
+                                    <swaggerAnnotations>true</swaggerAnnotations>
+                                    <reactive>true</reactive>
+                                    <modelMutable>true</modelMutable>
+                                </configOptions>
+                                <typeMappings>
+                                    <typeMapping>java.time.OffsetDateTime=java.time.LocalDateTime</typeMapping>
+                                </typeMappings>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.jetbrains.kotlin</groupId>
+                    <artifactId>kotlin-maven-plugin</artifactId>
+                    <version>${kotlin.version}</version>
+                    <configuration>
+                        <args>
+                            <arg>-Xjsr305=strict</arg>
+                        </args>
+                        <compilerPlugins>
+                            <plugin>spring</plugin>
+                        </compilerPlugins>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>kapt</id>
+                            <goals>
+                                <goal>kapt</goal>
+                            </goals>
+                            <configuration>
+                                <sourceDirs>
+                                    <sourceDir>${project.basedir}/src/main/kotlin</sourceDir>
+                                    <sourceDir>${project.basedir}/src/main/java</sourceDir>
+                                </sourceDirs>
+                                <annotationProcessorPaths>
+                                    <annotationProcessorPath>
+                                        <groupId>org.springframework.boot</groupId>
+                                        <artifactId>spring-boot-configuration-processor</artifactId>
+                                        <version>${spring-boot.version}</version>
+                                    </annotationProcessorPath>
+                                </annotationProcessorPaths>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>compile</id>
+                            <phase>compile</phase>
+                            <goals>
+                                <goal>compile</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>test-compile</id>
+                            <phase>test-compile</phase>
+                            <goals>
+                                <goal>test-compile</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.jetbrains.kotlin</groupId>
+                            <artifactId>kotlin-maven-allopen</artifactId>
+                            <version>${kotlin.version}</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.jetbrains.kotlin</groupId>
+                            <artifactId>kotlin-maven-noarg</artifactId>
+                            <version>${kotlin.version}</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <version>${spring-boot.version}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+</project>

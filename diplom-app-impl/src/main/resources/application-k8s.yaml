@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: diplom-application
+  data:
+    mongodb:
+      host: ${MONGO_HOST}
+      port: ${MONGO_PORT}
+      database: diplom_application
+schedule:
+  application:
+    fixedRate: ${APPLICATION_SCHEDULE_RATE}
+kafka:
+  bootstrap-address: ${KAFKA_HOST}
+  offer-in:
+    destination: ${KAFKA_APP_DESTINATION}
+server:
+  port: ${TOMCAT_PORT}

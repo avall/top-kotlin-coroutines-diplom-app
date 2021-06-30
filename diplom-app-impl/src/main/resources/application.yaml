@@ -1,0 +1,17 @@
+server:
+  port: 8081
+spring:
+  application:
+    name: diplom-application
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: diplom_application
+schedule:
+  application:
+    fixedRate: 30000
+kafka:
+  bootstrap-address: http://127.0.0.1:9092
+  offer-in:
+    destination: offer-in
